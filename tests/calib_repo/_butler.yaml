@@ -1,0 +1,21 @@
+mapper: testMapper.TestMapper
+datasets:
+  flat:
+    datasetClass: exposure
+    urls: ['file:flat/v{version}/{date}/flat-f{filter}-c{ccd}.fits']
+    lookups:
+    - outputs: ['date']
+      join: ['raw']
+      where: 'raw.taiObs BETWEEN flat.validStart AND flat.validEnd'
+  cameraGeom:
+    datasetClass: cameraGeom
+    urls: ['file:cameraGeom/v{version}/{date}']
+    lookups:
+    - outputs: ['date']
+      join: ['raw']
+      where: 'raw.taiObs BETWEEN flat.validStart AND flat.validEnd'
+defaults:
+  flat:
+    version: 'MAX(column=version)'
+  cameraGeom:
+    version: 'MAX(file)'

@@ -1,0 +1,24 @@
+classes:
+  versionedCalibrationExposure:
+    readers: [ExposureFits.get]
+    writers: [ExposureFits.put]
+    pathTemplate: '{datasetType}/{visit}/{raft}/{sensor}/{datasetType}-V{visit}-R{raft}-S{sensor}.fits'
+  exposure:
+    readers: [ExposureFits.get]
+    writers: [ExposureFits.put]
+    pathTemplate: '{datasetType}/{visit}/{raft}/{sensor}/V-R-S.fits'
+  image:
+    readers: [ImageFits.get]
+    writers: [ImageFits.put]
+    pathTemplate: '{datasetType}/{visit}/{raft}/{sensor}/{channel}/{datasetType}-V{visit}-R{raft}-S{sensor}-C{channel}.fits'
+  propertyset:
+    readers: [PropertySetYaml.get]
+    writers: [PropertySetYaml.put]
+  config:
+    readers: [Config.get]
+    writers: [Config.put]
+  ampExposureId:
+    readers: [ExposureId.getAmpId]
+  ccdVisitId:
+    readers: [ExposureId.getCcdVisit]
+registry: sqlite:_butler.sqlite3

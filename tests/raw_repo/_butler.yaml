@@ -1,0 +1,5 @@
+mapper: testMapper.TestMapper
+datasets:
+  raw:
+    datasetClass: image
+    urls: ['v{visit}-f{filter}/snap{snap}/ccd{sensor}/raw-f{filter}-E{snap:03d}-S{sensor}-C{channel}.fits']
