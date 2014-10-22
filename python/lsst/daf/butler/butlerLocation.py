@@ -2,6 +2,8 @@ import importlib
 
 class ButlerLocation(object):
     def __init__(self, path, storage, dataId):
+        """Create a ButlerLocation object."""
+
         self.url = path
         components = storage.rsplit(".", 2)
         if len(components) < 3:

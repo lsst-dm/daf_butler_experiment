@@ -23,13 +23,37 @@ from mapper import Mapper
 
 
 class Butler(object):
+    """
+    A Butler manages the persistence and retrieval of datasets in
+    repositories for Tasks.
+
+    A dataset is any data item that makes sense to persist or retrieve.  This
+    can be as small as a single bit or as large as an image or a catalog of
+    measurements.
+
+    A repository is a collection of datasets of different types.  Each dataset
+    type may be stored in a different physical location, which could be in a
+    filesystem, in network-based storage, or in a database.
+
+    One repository managed by a Butler is an output repository and is both
+    readable and writable.  Other input read-only repositories may be
+    attached; they are searched for datasets that are not found in the output
+    repository.  The input repositories may themselves have other input
+    repositories attached, forming a directed graph.  This graph is searched
+    depth-first.
+    """
 
     def __init__(self, outputRepo, inputRepos=None):
+        """Construct a Butler to manage an output (read/write) repository,
+        attaching zero or more input (read-only) repositories."""
+
         self.mapper = Mapper.create(outputRepo, inputRepos)
         self.registryPath = self.mapper.registryPath
         self.provenance = []
 
     def get(self, datasetType, dataId={}, **kwArgs):
+        """Retrieve a dataset."""
+
         datasetType = self._handleAlias(datasetType)
         dataId = self._makeDataId(dataId, **kwArgs)
         locationList = []
@@ -44,6 +68,8 @@ class Butler(object):
         return obj
 
     def put(self, obj, datasetType, dataId={}, **kwArgs):
+        """Persist a dataset."""
+
         datasetType = self._handleAlias(datasetType)
         dataId = self._makeDataId(dataId, **kwArgs)
         locationList = self.mapper.map(datasetType, dataId, True)
@@ -63,17 +89,27 @@ class Butler(object):
             self.recordProvenance("put", datasetType, dataId, locationList)
 
     def getKeys(self, datasetType=None):
+        """Return the list of keys understood by the Butler for a given
+        dataset type or all dataset types if datasetType=None (default)."""
+
         datasetType = self._handleAlias(datasetType)
         return self.mapper.getKeys(datasetType)
 
     def getDatasetTypes(self):
+        """Return the list of known dataset types."""
+
         return self.mapper.getDatasetTypes()
 
     def createDatasetType(self, datasetType, datasetClass, pathTemplate, **kwargs):
+        """Create a new dataset type based on an existing dataset class."""
+
         datasetType = self._handleAlias(datasetType)
         return self.mapper.createDatasetType(datasetType, datasetClass, **kwargs)
 
     def getRefSet(self, datasetType, partialDataId={}, **kwargs):
+        """Return the list of references to datasets of a given dataset type
+        that match a partial data id."""
+
         datasetType = self._handleAlias(datasetType)
         partialDataId = self._makeDataId(partialDataId, **kwArgs)
         return [DataRef(self, dataId)
@@ -81,6 +117,9 @@ class Butler(object):
                 self.mapper.listDatasets(self, datasetType, partialDataId)]
 
     def defineAlias(self, alias, datasetType):
+        """Define a dataset type alias.  This dataset type can be used in any
+        other Butler call by specifying "@" plus the alias name."""
+
         if alias in self.aliases:
             log.warn("Overwriting existing dataset type alias {}: "
                     "old = {}, new = {}".format(
@@ -88,6 +127,8 @@ class Butler(object):
         self.aliases[alias] = datasetType
 
     def recordProvenance(self, op, datasetType, dataId, locationList):
+        """Record provenance information."""
+
         log.info("Provenance: {} {} {} {}".format(
             op, datasetType, dataId, locationList))
         self.provenance.append((op, datasetType, dataId, [repr(location) for
