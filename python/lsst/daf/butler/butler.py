@@ -8,7 +8,6 @@ from mapper import Mapper
 # One butler per task
 # One mapper per repo, customized for camera
   # config can specify parent repos
-# Datasets loaded from first repo in search order
 # One registry per repo
 
 # Dataset classes specify readers/writers, template templates
@@ -41,6 +40,9 @@ class Butler(object):
     repository.  The input repositories may themselves have other input
     repositories attached, forming a directed graph.  This graph is searched
     depth-first.
+
+    Each repository contains a configuration file defining the dataset types
+    contained in it.
     """
 
     def __init__(self, outputRepo, inputRepos=None):
@@ -100,7 +102,7 @@ class Butler(object):
 
         return self.mapper.getDatasetTypes()
 
-    def createDatasetType(self, datasetType, datasetClass, pathTemplate, **kwargs):
+    def createDatasetType(self, datasetType, datasetClass, **kwargs):
         """Create a new dataset type based on an existing dataset class."""
 
         datasetType = self._handleAlias(datasetType)
