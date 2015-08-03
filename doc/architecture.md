@@ -1,5 +1,7 @@
 # Architecture Notes
 
+![Architecture Diagram](Butler Architecture Diagram.png)
+
 ## The Butler
 
 The Butler is the interface between applications pipelines and the actual data.
