@@ -1,8 +1,12 @@
-# Architecture Notes
+==================
+Architecture Notes
+==================
 
 ![Architecture Diagram](Butler Architecture Diagram.png)
 
-## The Butler
+The Butler
+==========
+
 
 The Butler is the interface between applications pipelines and the actual data.
 It is the primary data access interface.  It hides any detail of how that
@@ -22,7 +26,8 @@ need a more flexible framework that allows a variety of plugins including ones
 that would translate file formats into in-memory objects and translate
 key/value pairs into other key/value pairs.
 
-## Datasets
+Datasets
+========
 
 A Dataset is the persisted form of an in-memory object.  It could be a single
 item, like an integer or even a boolean.  It could be a composite like a
@@ -38,7 +43,8 @@ inherently versioned.  Their description could include a version.  We also need
 a way of versioning repositories which could be a number or a validity time
 range.
 
-## Repositories
+Repositories
+============
 
 A Repository is a collection of datasets.  A repository currently has a
 metadata database within it to help in finding datasets.  (This needs to be
@@ -47,7 +53,8 @@ repository (the configuration for a Mapper) is stored separately as code (or
 `pex_policy` configuration that is treated like code).  In the New Butler, it
 moves into the repository and travels with it and can be modified in it.
 
-## Dataset Identifiers
+Dataset Identifiers
+===================
 
 Identifying a dataset in a repository is via key/value pairs that are
 scientifically meaningful, in the vernacular or language of application writers
@@ -78,7 +85,8 @@ for a given dataset type.  They are not usually arbitrary types but are
 specific types and values can even be validated.  Incorrect values will just
 fail.
 
-## Rendezvous
+Rendezvous
+==========
 
 The Butler needs to be able to derive additional key/value pairs from a dataset
 identifier.  The primary use is to rendezvous one dataset with another.  For
@@ -92,7 +100,8 @@ an internally-managed database.  The Butler needs to provide primitives for
 doing that kind of database lookup; the Butler configuration makes use of those
 primitives to associate datasets.
 
-## Dataset Types
+Dataset Types
+=============
 
 The dataset type is a label given to a group of datasets that reflects its
 meaning or usage.  It is not the same as a Python or C++ class.  A given Python
@@ -124,14 +133,16 @@ templates (known as "dataset genres", since "class" is very overloaded) that
 are provided by something code-like that the application can then instantiate
 to create a new dataset type within that genre.
 
-## DataRefs
+DataRefs
+========
 
 A DataRef is a data identifier plus a Butler.  The idea behind it is that a
 DataRef could be applied to multiple dataset types as long as the keys are
 appropriate.  The application writer has to know that this is the case.  A set
 of DataRefs can be used to access collections of data.
 
-## Mappers
+Mappers
+=======
 
 The Mapper should not be used by application code directly.  Currently, that
 wall has been breached in places.  The Mapper should be driven by the
@@ -153,7 +164,8 @@ would have the database connection information, database name, table name or
 set of table names if a join is required, and a `WHERE` clause.  The Mapper
 would have to translate the data identifier into those concrete items.
 
-## Transport
+Transport
+=========
 
 A filesystem can be accessed directly through filesystem operations or remotely
 via HTTP or WebDAV.  Originally, it seemed like it would be good to separate
@@ -176,7 +188,8 @@ the local Butler would then execute the necessary code.  This is akin to a
 staging service, as the data would likely need to be persisted on the local
 end.  There could be performance implications as a result.
 
-## Aliases
+Aliases
+=======
 
 We want to write code that is not only not specific to a given camera but not
 even specific to a given dataset type.  If you are processing certain images,
@@ -187,7 +200,8 @@ of them.  You can thus define an alias at the command line processing level of
 your application and have the underlying algorithms all use the alias and not
 worry about what dataset type it actually corresponds to.
 
-## Input and Output Repositories and Their Configurations
+Input and Output Repositories and Their Configurations
+======================================================
 
 A Butler manages a repository.  The New Butler manages the output repository
 that an application is going to create datasets in.  If an application does not
@@ -241,7 +255,8 @@ within it for dataset existence information and provenance.  But a downstream
 user would not be required to use the SQLite database for anything if it
 understood the repository format.
 
-## Configuration Representation
+Configuration Representation
+============================
 
 Attempts were made to store configuration in files or in a database table with
 a well-defined schema.  But users should be able to easily create new
@@ -255,7 +270,8 @@ to configuration files with filesystem-based locking.  Each dataset type would
 likely be in its own file (or its own table) so that applications that are
 creating different dataset types do not interfere with each other.
 
-## Flexibility versus Strict Checking
+Flexibility versus Strict Checking
+==================================
 
 The Genre is generally expected to have the dataset type in its location
 template so that two dataset types could not collide.  But there is no
@@ -328,7 +344,8 @@ that would be required (which might come from an input data identifier).
 The current `daf_butler` code is just the beginning of the framework.  There
 are many plugins that will be needed.
 
-## Composite Datasets and ORM
+Composite Datasets and ORM
+==========================
 
 The next level of complexity is the idea of composite datasets.  A dataset can
 be accessed as an entire dataset, but you can also access parts of it.  These
@@ -354,23 +371,27 @@ For Python objects, this could be maintained in a hidden Butler-implementation
 field in the object, but something like an int could not be handled this way.
 But it is not the responsibility of the Butler to do all ORM.
 
-## Provenance
+Provenance
+==========
 
 The Butler should record all datasets that a task retrieves and persists; in
 particular, it should record everything that has been retrieved up to the point
 that an object is persisted (as that is the maximum relevant set for
 provenance).
 
-## Perceived problems with the Old Butler
+Perceived problems with the Old Butler
+======================================
 
 * the need to update Policies to create new datasets
 * difficulty defining new storages
 * inability to query databases
 * inability to alias dataset types
-* no real support for raw filesystem with pathname templates using globs (instead of iterating through the registry database)
+* no real support for raw filesystem with pathname templates using globs 
+  (instead of iterating through the registry database)
 * inability to update registry database as datasets are created
 
-## Plugins, Genres, and Camera-Specific Mapper Subclasses
+Plugins, Genres, and Camera-Specific Mapper Subclasses
+======================================================
 
 Plugin code should be able to be located in any package.  Storage plugins
 should be able to be a free function or a method in a class, whether a storage
@@ -438,8 +459,8 @@ would not be camera-specific.
 The camera specifies a set of Genres as a default.  The user should be able to
 include other Genres as well (but they would still be specified in code).
 
-
-# Butler Interface
+Butler Interface
+================
 
 The New Butler interface includes a way to create a Butler, specify the
 repository or repositories that it is managing, get a dataset, put a dataset,
@@ -450,9 +471,12 @@ datasets that exist for a given dataset type with a partial data identifier
 part of a dataset type name.
 
 
-# Design issues
+=============
+Design issues
+=============
 
-## Relevant Trac tickets:
+Relevant Trac tickets
+=====================
 
 * \#2887, unpersist a subclass of a config
 * \#2425, provide better error messages if a data item does not exist
@@ -460,55 +484,73 @@ part of a dataset type name.
 * \#3050, allow hashes in paths
 * \#3038, optimize registry loading
 * \#3037, return Exposure
-* \#3036, look up calibrations without visit ids (should be by valid date or something similar)
+* \#3036, look up calibrations without visit ids (should be by valid date or 
+  something similar)
 
 
-# Internal Components
+===================
+Internal Components
+===================
 
-## Mapper
+Mapper
+======
 
-    Not used by application code; only used via Butler
-    Driven by per-repository configuration
-    Camera-specific subclasses recorded in repository configuration
-    Obtains a location template based on dataset type
-        Inherits from dataset class
-        Includes URL path with transport, storage method, optionally Python type
-        Includes filesystem locations and database tables/queries
-        Read-only and write-only types
-    Expands an input DataId with additional key/value pairs (fixed and/or as-needed) needed to expand location template
-        Queries registry databases in input repositories as needed
-        Globs in filesystem if needed
-    Expands location template into a ButlerLocation
-    Optionally can provide methods for standardizing (post-processing) retrieved data
-    Can be used to bidirectionally map DataIds to numeric identifiers
-        By treating numeric identifier as a dataset or as a single DataId key\'s value
-        Uses special IdStorage
+* Not used by application code; only used via Butler
 
-    Provides utilities for subclasses
+* Driven by per-repository configuration
 
-        Maintain templates for dataset types in repository configuration
+* Camera-specific subclasses recorded in repository configuration
 
-        Look up key/value pairs using equality or range joins in registry databases
+* Obtains a location template based on dataset type
 
-        Glob for key/value pairs in filesystem
+  * Inherits from dataset class
+  * Includes URL path with transport, storage method, optionally Python type
+  * Includes filesystem locations and database tables/queries
+  * Read-only and write-only types
 
-        Record metadata of new datasets in registries
+* Expands an input DataId with additional key/value pairs (fixed and/or 
+  as-needed) needed to expand location template
 
-        Maintain registry of registries
+  * Queries registry databases in input repositories as needed
+  * Globs in filesystem if needed
 
-## ButlerLocation
+* Expands location template into a ButlerLocation
 
-    All location information needed for a Storage
-    May include:
-        Expanded path template(s)
-        Python object class name
-        Storage class name
-        DataId
-        Additional key/value pairs
+* Optionally can provide methods for standardizing (post-processing) retrieved 
+  data
 
-## Butler
+* Can be used to bidirectionally map DataIds to numeric identifiers
 
-    Obtains mapper class name from repository
-    Calls Mapper to translate DataId into location
-    Calls appropriate Storage to retrieve or persist data
-    Repository identified by root (URL) path
+  * By treating numeric identifier as a dataset or as a single DataId key\'s 
+    value
+
+  * Uses special IdStorage
+
+* Provides utilities for subclasses
+
+  * Maintain templates for dataset types in repository configuration
+  * Look up key/value pairs using equality or range joins in registry databases
+  * Glob for key/value pairs in filesystem
+  * Record metadata of new datasets in registries
+  * Maintain registry of registries
+
+
+ButlerLocation
+==============
+All location information needed for a Storage
+
+May include:
+
+* Expanded path template(s)
+* Python object class name
+* Storage class name
+* DataId
+* Additional key/value pairs
+
+Butler
+======
+
+* Obtains mapper class name from repository
+* Calls Mapper to translate DataId into location
+* Calls appropriate Storage to retrieve or persist data
+* Repository identified by root (URL) path
