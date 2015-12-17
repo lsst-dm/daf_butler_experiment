@@ -2,7 +2,7 @@
 Architecture Notes
 ==================
 
-![Architecture Diagram](Butler Architecture Diagram.png)
+.. image:: Butler%20Architecture%20Diagram.png
 
 The Butler
 ==========
